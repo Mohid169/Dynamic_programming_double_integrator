@@ -8,11 +8,13 @@ def double_integrator():
     D = np.zeros((2,1))
     return LinearSystem(A,B,C,D)
 
+#Define Cost Function
 def cost_function(state, control, Q, R):
     state_cost = state.T @ Q @ state
     control_cost = control.T @ R @ control
     return state_cost + control_cost
 
+#Define Terminal Cost Function
 def terminal_cost_function(terminal_state, Q_f):
     return terminal_state.T @ Q_f @ terminal_state
 
