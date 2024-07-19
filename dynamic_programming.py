@@ -37,27 +37,15 @@ J[num_time_steps] = np.zeros((2,2))
 
 '''
 # Backward Recursion
-for i = num_time_steps - 1 down to 0:
-    min_cost = infinity
-    optimal_u = None
-    
-    for possible_u in possible_control_inputs:
-        # Compute the next state using system dynamics
-        x_next = A * x[i] + B * possible_u * dt
-        
-        # Compute the immediate cost
-        immediate_cost = cost_function(x[i], possible_u, Q, R)
-        
-        # Compute the cost-to-go
-        cost_to_go = immediate_cost + J[i + 1]
-        
-        # Update the value function and optimal control if current cost is lower
-        if cost_to_go < min_cost:
-            min_cost = cost_to_go
-            optimal_u = possible_u
-    
-    # Store the minimum cost and optimal control for the current step
-    J[i] = min_cost
-    u_opt[i] = optimal_u
+Initialize J_hat to zero for all states
+Repeat until convergence:
+    For each state s_i:
+        For each action a:
+            Compute cost = l(s_i, a) + J_hat(f(s_i, a))
+        J_hat(s_i) = min(cost over all actions a)
+Extract the optimal policy:
+    For each state s_i:
+        pi_star(s_i) = argmin_a [l(s_i, a) + J_hat(f(s_i, a))]
+
 
 '''
