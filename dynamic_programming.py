@@ -33,19 +33,65 @@ u_opt = [None] * num_time_steps
 #Terminal Cost 
 J[num_time_steps] = np.zeros((2,2))
 
-#Backward dynamic programming recursion
+#Define State and Actions
+states = [np.array([x, v]) for x in np.linspace(-10, 10, 100) for v in np.linspace(-10,10, 100)]
+actions = np.linspace(-1, 1, 21)
+
+#Value Iteration Algorithm 
+tolerance = 1e-6
+max_iterations = 1000
+
 
 '''
-# Backward Recursion
-Initialize J_hat to zero for all states
-Repeat until convergence:
-    For each state s_i:
-        For each action a:
-            Compute cost = l(s_i, a) + J_hat(f(s_i, a))
-        J_hat(s_i) = min(cost over all actions a)
-Extract the optimal policy:
-    For each state s_i:
-        pi_star(s_i) = argmin_a [l(s_i, a) + J_hat(f(s_i, a))]
+psuedo code: for iteration in range(max_iterations):
+    J_new = array of size (num_time_steps + 1), initialized to None
+    J_new[num_time_steps] = J[num_time_steps]
+    
+    for t in range(num_time_steps - 1, -1, -1):
+        J_new[t] = zero_matrix(len(states), 1)
+        
+        for i, state in enumerate(states):
+            min_cost = infinity
+            best_action = None
+            
+            for action in actions:
+                next_state = A @ state + B * action * dt
+                next_state_index = index_of_closest_state(states, next_state)
+                
+                cost = cost_function(state, action, Q, R) + J[t + 1][next_state_index]
+                
+                if cost < min_cost:
+                    min_cost = cost
+                    best_action = action
+            
+            J_new[t][i] = min_cost
+            u_opt[t] = best_action
+    
+    # Check for convergence
+    if max(abs(J_new[t] - J[t])) < tolerance for t in range(num_time_steps):
+        J = J_new
+        break
+    
+    J = J_new
+
+# Extract the optimal policy
+pi_star = array of size len(states), initialized to None
+
+for i, state in enumerate(states):
+    min_cost = infinity
+    best_action = None
+    
+    for action in actions:
+        next_state = A @ state + B * action * dt
+        next_state_index = index_of_closest_state(states, next_state)
+        
+        cost = cost_function(state, action, Q, R) + J[0][next_state_index]
+        
+        if cost < min_cost:
+            min_cost = cost
+            best_action = action
+    
+    pi_star[i] = best_action
 
 
 '''
