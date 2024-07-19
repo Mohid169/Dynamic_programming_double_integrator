@@ -50,7 +50,7 @@ for iteration in range(max_iterations):
     J_new[num_time_steps] = J[num_time_steps] # set to the terminal cost
 
     for t in range(num_time_steps-1, -1, -1):
-        J_new[t] = np.zeros((len(states,), 1 )) # Initialize to zeros for current time step
+        J_new[t] = np.zeros((len(states), 1 )) # Initialize to zeros for current time step
         
         for i, state in enumerate(states):
             min_cost = float('inf')
