@@ -69,7 +69,6 @@ for iteration in range(max_iterations):
                 J_new[t][i] = min_cost
                 u_opt[t] = best_action
     
-    J_array = np.array([J_new[t].flatten() for t in range(num_time_steps + 1)])
   
     #TODO:  Check convergence (optional)
     # Check for convergence
