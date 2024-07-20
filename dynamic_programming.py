@@ -39,9 +39,9 @@ actions = np.linspace(-1, 1, 21)
 #Terminal Cost 
 J[num_time_steps] = np.zeros((len(states),1))
 
-
+print(J)
 #Value Iteration Algorithm 
-tolerance = 1e-3
+tolerance = 1e-1
 max_iterations = int(num_time_steps / dt)
 
 
@@ -72,11 +72,12 @@ for iteration in range(max_iterations):
   
     #TODO:  Check convergence (optional)
     # Check for convergence
-    #if max(abs(J_new[t] - J[t])) < tolerance for t in range(num_time_steps):
-     #   J = J_new
-      #  break
+    if max(abs(J_new[t] - J[t])) < tolerance:
+        J = J_new
+        print('Converged')
+        break
     
-    #J = J_new
+    J = J_new
 
 #TODO: Implement opitmal control policy extraction
 '''
