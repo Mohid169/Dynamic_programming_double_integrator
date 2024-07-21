@@ -72,7 +72,7 @@ for iteration in range(max_iterations):
   
     #TODO:  Check convergence (optional)
     # Check for convergence
-    if max(abs(J_new[t] - J[t])) < tolerance:
+    if np.max(abs(J_new[t] - J[t])) < tolerance:
         J = J_new
         print('Converged')
         break
