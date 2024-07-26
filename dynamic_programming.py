@@ -64,12 +64,11 @@ for iteration in range(max_iterations):
                 if cost < min_cost:
                     min_cost = cost
                     best_action = action
-                print(cost  )
+                
             
             J_new[t][i] = min_cost
             u_opt[t] = best_action
 
-    print(J_new[t])
     # Convergence Check
     if np.max(np.abs(np.array(J_new) - np.array(J))) < tolerance:  # Updated convergence check
         J = [arr.copy for arr in J_new]
@@ -94,8 +93,20 @@ for i, state in enumerate(states):
     best_action = None 
 
     for action in actions:
-        next_state = state + (A @ state + B @ state )*dt 
-       # next_state =  ß
+        action_vec = np.array([[action]])
+        next_state = state + (A @ state + B @ action_vec )*dt 
+        next_state = next_state.flatten()  # Flatten for indexing
+        next_state_index = np.argmin(np.linalg.norm(np.array(states) - next_state, axis=1))
+        cost = cost_function(state, action, Q, R) + J[i][next_state_index]
+
+        if cost < min_cost:
+            min_cost = cost
+            best_action
+    
+    pi_star[i] = best_action
+
+
+        # next_state =  ß
 #for i, state in enumerate(states):
  #   min_cost = infinity
   #  best_action = None
