@@ -59,15 +59,22 @@ for iteration in range(max_iterations):
                 next_state = state + (A @ state + B @ action_vec) * dt # euler integration to find the next state 
                 next_state = next_state.flatten()  # Flatten for indexing
                 next_state_index = np.argmin(np.linalg.norm(np.array(states) - next_state, axis=1))
-                cost = cost_function(state, action_vec, Q, R) + J[t + 1][next_state_index]  # cost of being at the current state + Cost to go
+                
+                # Debug prints
+                immediate_cost = cost_function(state, action_vec, Q, R)
+                cost_to_go = J[t + 1][next_state_index]
+                print(f"t: {t}, i: {i}, action: {action}")
+                print(f"immediate_cost: {immediate_cost}, cost_to_go: {cost_to_go}")
+                print(f"next_state_index: {next_state_index}, J[t+1] shape: {J[t+1].shape}")
+                
+                cost = immediate_cost + cost_to_go
                 
                 if cost < min_cost:
                     min_cost = cost
                     best_action = action
-                
             
-            J_new[t][i] = min_cost
-            u_opt[t] = best_action
+            J_new[t][i] = float(min_cost)  # Convert to float to ensure it's a scalar
+            u_opt[t][i] = best_action
 
     # Convergence Check
     if np.max(np.abs(np.array(J_new) - np.array(J))) < tolerance:  # Updated convergence check
@@ -81,45 +88,26 @@ print("Optimal cost-to-go J:", J)
 print("Optimal policy u:", u_opt)
 
 
-#TODO: Implement opitmal control policy extraction
 # Extract the optimal policy
+pi_star = [np.zeros(len(states)) for _ in range(num_time_steps)]
 
+for t in range(num_time_steps):
+    for i, state in enumerate(states):
+        state = state.reshape(-1, 1)  # Ensure state is a column vector
+        min_cost = float('inf')
+        best_action = None 
 
-# Extract the optimal policy
-pi_star = [np.zeros(len(states)) for _ in range(num_time_steps + 1)]
+        for action in actions:
+            action_vec = np.array([[action]])
+            next_state = state + (A @ state + B @ action_vec) * dt 
+            next_state = next_state.flatten()  # Flatten for indexing
+            next_state_index = np.argmin(np.linalg.norm(np.array(states) - next_state, axis=1))
+            cost = cost_function(state, action_vec, Q, R) + J[t + 1][next_state_index]
 
-for i, state in enumerate(states):
-    min_cost = float('inf')
-    best_action = None 
-
-    for action in actions:
-        action_vec = np.array([[action]])
-        next_state = state + (A @ state + B @ action_vec )*dt 
-        next_state = next_state.flatten()  # Flatten for indexing
-        next_state_index = np.argmin(np.linalg.norm(np.array(states) - next_state, axis=1))
-        cost = cost_function(state, action, Q, R) + J[i][next_state_index]
-
-        if cost < min_cost:
-            min_cost = cost
-            best_action
+            if cost < min_cost:
+                min_cost = cost
+                best_action = action
     
-    pi_star[i] = best_action
+        pi_star[t][i] = best_action
 
-
-        # next_state =  ß
-#for i, state in enumerate(states):
- #   min_cost = infinity
-  #  best_action = None
-    
-    f#or action in actions:
-      #  next_state = A @ state + B * action * dt
-      #  next_state_index = index_of_closest_state(states, next_state)
-        
-      #  cost = cost_function(state, action, Q, R) + J[0][next_state_index]
-        
-       # if cost < min_cost:
-       #     min_cost = cost
-        #    best_action = action
-    
-   # pi_star[i] = best_action
-
+print("Optimal policy pi_star:", pi_star)
