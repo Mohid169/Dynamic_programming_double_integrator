@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # Define double integrator system variables
 def double_integrator():
     A = np.array([[0, 1], [0, 0]])  # Continuous-time state transition matrix
