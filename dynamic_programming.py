@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
 # Define double integrator system variables
 def double_integrator():
     A = np.array([[0, 1], [0, 0]])  # Continuous-time state transition matrix
@@ -76,11 +77,7 @@ for iteration in range(max_iterations):
                 # Debug prints
                 immediate_cost = cost_function(state, action_vec, Q, R)
                 cost_to_go = J[t + 1][next_state_index]
-                print(f"t: {t}, i: {i}, action: {action}")
-                print(f"immediate_cost: {immediate_cost}, cost_to_go: {cost_to_go}")
-                print(
-                    f"next_state_index: {next_state_index}, J[t+1] shape: {J[t+1].shape}"
-                )
+               
 
                 cost = immediate_cost + cost_to_go
 
@@ -106,28 +103,3 @@ print("Optimal policy u:", u_opt)
 
 
 pi_star = u_opt
-
-# Create a grid of states
-x = np.linspace(-10, 10, 20)
-v = np.linspace(-10, 10, 20)
-X, V = np.meshgrid(x, v)
-
-# Reshape u_opt for plotting
-u_opt_reshaped = u_opt[0].reshape(20, 20)
-
-# Create the plot
-plt.figure(figsize=(12, 10))
-plt.quiver(X, V, np.ones_like(X), np.zeros_like(X), u_opt_reshaped, scale=30, cmap='coolwarm')
-plt.colorbar(label='Optimal Action')
-
-plt.title('Optimal Policy for Double Integrator')
-plt.xlabel('Position')
-plt.ylabel('Velocity')
-
-# Add streamlines to show state trajectories
-dx = V
-dy = u_opt_reshaped
-plt.streamplot(X, V, dx, dy, color='k', linewidth=0.5, density=0.5, arrowsize=0.5)
-
-plt.grid(True)
-plt.show()
