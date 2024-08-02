@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # Define double integrator system variables
@@ -104,28 +105,29 @@ print("Optimal cost-to-go J:", J)
 print("Optimal policy u:", u_opt)
 
 
-# Extract the optimal policy
-pi_star = [np.zeros(len(states)) for _ in range(num_time_steps)]
+pi_star = u_opt
 
-for t in range(num_time_steps):
-    for i, state in enumerate(states):
-        state = state.reshape(-1, 1)  # Ensure state is a column vector
-        min_cost = float("inf")
-        best_action = None
+# Create a grid of states
+x = np.linspace(-10, 10, 20)
+v = np.linspace(-10, 10, 20)
+X, V = np.meshgrid(x, v)
 
-        for action in actions:
-            action_vec = np.array([[action]])
-            next_state = state + (A @ state + B @ action_vec) * dt
-            next_state = next_state.flatten()  # Flatten for indexing
-            next_state_index = np.argmin(
-                np.linalg.norm(np.array(states) - next_state, axis=1)
-            )
-            cost = cost_function(state, action_vec, Q, R) + J[t + 1][next_state_index]
+# Reshape u_opt for plotting
+u_opt_reshaped = u_opt[0].reshape(20, 20)
 
-            if cost < min_cost:
-                min_cost = cost
-                best_action = action
+# Create the plot
+plt.figure(figsize=(12, 10))
+plt.quiver(X, V, np.ones_like(X), np.zeros_like(X), u_opt_reshaped, scale=30, cmap='coolwarm')
+plt.colorbar(label='Optimal Action')
 
-        pi_star[t][i] = best_action
+plt.title('Optimal Policy for Double Integrator')
+plt.xlabel('Position')
+plt.ylabel('Velocity')
 
-print("Optimal policy pi_star:", pi_star)
+# Add streamlines to show state trajectories
+dx = V
+dy = u_opt_reshaped
+plt.streamplot(X, V, dx, dy, color='k', linewidth=0.5, density=0.5, arrowsize=0.5)
+
+plt.grid(True)
+plt.show()
