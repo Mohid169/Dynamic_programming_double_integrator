@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import imagio 
 
 
 
@@ -103,3 +104,18 @@ print("Optimal policy u:", u_opt)
 
 
 pi_star = u_opt
+
+
+def simulate_trajectory(intial_state, num_steps):
+    trajectory = [intial_state]
+    for t in range(num_steps):
+        current_state = trajectory[-1]
+        state_index = np.argmin
+        state_index = np.argmin(np.linalg.norm(np.array(states) - current_state, axis=1))
+        control = pi_star[t][state_index]
+        next_state = current_state + (A @ current_state.reshape(-1, 1) + B * control).flatten() * dt
+        trajectory.append(next_state)
+    return np.array(trajectory)
+
+
+
