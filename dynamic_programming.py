@@ -107,6 +107,21 @@ pi_star = u_opt
 
 
 def simulate_trajectory(intial_state, num_steps):
+    """
+    Simulates the trajectory of a dynamic system over a specified number of steps.
+
+    Parameters
+    ----------
+    initial_state : array-like
+        The initial state of the system.
+    num_steps : int
+        The number of time steps to simulate.
+
+    Returns
+    -------
+    np.ndarray
+        An array containing the simulated trajectory of the system.
+    """
     trajectory = [intial_state]
     for t in range(num_steps):
         current_state = trajectory[-1]
