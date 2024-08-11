@@ -142,21 +142,10 @@ norm =plt.Normalize(U.min(), U.max())
 
 initial_states = [
     np.array([-8, 5]),
-    np.array([8,- 5]), 
-    np.array([0,9]),
-    np.array([0,-9]),
-    np.array([-5, -8])
+   
 ]
 
 trajectories = [simulate_trajectory(initial_state, num_time_steps) for initial_state in initial_states]
-
-
-
-#import numpy as np
-import matplotlib.pyplot as plt
-import imageio
-
-# ... (previous code)
 
 # Create frames for the GIF
 frames = []
