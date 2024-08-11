@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import imagio 
+import imageio 
+import io
 
 
 
@@ -148,14 +149,24 @@ initial_states = [
 ]
 
 trajectories = [simulate_trajectory(initial_state, num_time_steps) for initial_state in initial_states]
+
+
+
+#import numpy as np
+import matplotlib.pyplot as plt
+import imageio
+
+# ... (previous code)
+
+# Create frames for the GIF
 frames = []
-fig, ax = plt.subplots(10,10)
+fig, ax = plt.subplots(figsize=(10, 8), dpi=100)
 
 for step in range(num_time_steps + 1):
     ax.clear()
     
-    # Plot the vector field
-    quiver = ax.quiver(X, V, U, np.zeros_like(U), color=cmap(norm(U)), scale=50, width=0.002, alpha=0.3)
+    # Plot the vector field without color mapping
+    ax.quiver(X, V, U, np.zeros_like(U), scale=50, width=0.002, alpha=0.3)
     
     # Plot trajectories up to the current step
     for trajectory in trajectories:
@@ -164,20 +175,21 @@ for step in range(num_time_steps + 1):
         if step == num_time_steps:
             ax.plot(trajectory[-1, 0], trajectory[-1, 1], 'ro', markersize=8)
     
-    # Add colorbar and labels
-    cbar = fig.colorbar(quiver, ax=ax)
-    cbar.set_label('Control input')
+    # Add labels
     ax.set_xlabel('Position')
     ax.set_ylabel('Velocity')
     ax.set_title(f'Optimal Control Policy and Particle Trajectories (Step {step})')
     ax.set_xlim(-10, 10)
     ax.set_ylim(-10, 10)
     
-    # Convert plot to image
-    fig.canvas.draw()
-    image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
-    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    frames.append(image)
+    # Save the figure to a byte buffer
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=100)
+    buf.seek(0)
+    
+    # Read the image from the buffer
+    img = imageio.imread(buf)
+    frames.append(img)
 
 plt.close(fig)
 
