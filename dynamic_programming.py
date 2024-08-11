@@ -148,28 +148,49 @@ initial_states = [
 trajectories = [simulate_trajectory(initial_state, num_time_steps) for initial_state in initial_states]
 
 # Create frames for the GIF
+# Simulate trajectories
+num_trajectories = 4
+initial_states = [
+    np.array([-8, 5]),
+    np.array([8, -5]),
+    np.array([0, 9]),
+    np.array([-5, -8])
+]
+
+trajectories = []
+for initial_state in initial_states:
+    trajectory = [initial_state]
+    state = initial_state
+    for t in range(num_time_steps):
+        state_index = np.argmin(np.linalg.norm(np.array(states) - state, axis=1))
+        control = pi_star[t][state_index]
+        next_state = state + (A @ state.reshape(-1, 1) + B * control).flatten() * dt
+        trajectory.append(next_state)
+    trajectories.append(np.array(trajectory))
+
+# Create frames for the GIF
 frames = []
-fig, ax = plt.subplots(figsize=(10, 8), dpi=100)
+fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+
+time_steps = np.arange(0, (num_time_steps + 1) * dt, dt)
 
 for step in range(num_time_steps + 1):
     ax.clear()
     
-    # Plot the vector field without color mapping
-    ax.quiver(X, V, U, np.zeros_like(U), scale=50, width=0.002, alpha=0.3)
+    # Plot position vs time for each trajectory
+    for i, trajectory in enumerate(trajectories):
+        ax.plot(time_steps[:step+1], trajectory[:step+1, 0], '-o', linewidth=2, markersize=4, label=f'Particle {i+1}')
     
-    # Plot trajectories up to the current step
-    for trajectory in trajectories:
-        ax.plot(trajectory[:step+1, 0], trajectory[:step+1, 1], '-o', linewidth=2, markersize=4)
-        ax.plot(trajectory[0, 0], trajectory[0, 1], 'go', markersize=8)
-        if step == num_time_steps:
-            ax.plot(trajectory[-1, 0], trajectory[-1, 1], 'ro', markersize=8)
-    
-    # Add labels
-    ax.set_xlabel('Position')
-    ax.set_ylabel('Velocity')
-    ax.set_title(f'Optimal Control Policy and Particle Trajectories (Step {step})')
-    ax.set_xlim(-10, 10)
-    ax.set_ylim(-10, 10)
+    # Add labels and title
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Position')
+    ax.set_title(f'Particle Positions Over Time (Step {step})')
+    ax.set_xlim(0, num_time_steps * dt)
+    ax.set_ylim(min(traj[:, 0].min() for traj in trajectories) - 1, 
+                max(traj[:, 0].max() for traj in trajectories) + 1)
+    ax.axhline(y=0, color='r', linestyle='--', label='Reference')
+    ax.legend()
+    ax.grid(True)
     
     # Save the figure to a byte buffer
     buf = io.BytesIO()
@@ -183,6 +204,6 @@ for step in range(num_time_steps + 1):
 plt.close(fig)
 
 # Save as GIF
-imageio.mimsave('particle_trajectories.gif', frames, fps=5)
+imageio.mimsave('particle_trajectories_over_time.gif', frames, fps=5)
 
-print("Animation has been saved as 'particle_trajectories.gif'")
+print("Animation has been saved as 'particle_trajectories_over_time.gif'")
