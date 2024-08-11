@@ -134,3 +134,54 @@ def simulate_trajectory(intial_state, num_steps):
 
 
 
+X, V = np.meshgrid(np.linspace(-10, 10, 20), np.linspace(-10, 10, 20))
+U =np.array(pi_star[0]).reshape(20, 20)
+cmap = plt.cm.get_cmap('coolwarm')
+norm =plt.Normalize(U.min(), U.max())
+
+initial_states = [
+    np.array([-8, 5]),
+    np.array([8,- 5]), 
+    np.array([0,9]),
+    np.array([0,-9]),
+    np.array([-5, -8])
+]
+
+trajectories = [simulate_trajectory(initial_state, num_time_steps) for initial_state in initial_states]
+frames = []
+fig, ax = plt.subplots(10,10)
+
+for step in range(num_time_steps + 1):
+    ax.clear()
+    
+    # Plot the vector field
+    quiver = ax.quiver(X, V, U, np.zeros_like(U), color=cmap(norm(U)), scale=50, width=0.002, alpha=0.3)
+    
+    # Plot trajectories up to the current step
+    for trajectory in trajectories:
+        ax.plot(trajectory[:step+1, 0], trajectory[:step+1, 1], '-o', linewidth=2, markersize=4)
+        ax.plot(trajectory[0, 0], trajectory[0, 1], 'go', markersize=8)
+        if step == num_time_steps:
+            ax.plot(trajectory[-1, 0], trajectory[-1, 1], 'ro', markersize=8)
+    
+    # Add colorbar and labels
+    cbar = fig.colorbar(quiver, ax=ax)
+    cbar.set_label('Control input')
+    ax.set_xlabel('Position')
+    ax.set_ylabel('Velocity')
+    ax.set_title(f'Optimal Control Policy and Particle Trajectories (Step {step})')
+    ax.set_xlim(-10, 10)
+    ax.set_ylim(-10, 10)
+    
+    # Convert plot to image
+    fig.canvas.draw()
+    image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    frames.append(image)
+
+plt.close(fig)
+
+# Save as GIF
+imageio.mimsave('particle_trajectories.gif', frames, fps=5)
+
+print("Animation has been saved as 'particle_trajectories.gif'")
