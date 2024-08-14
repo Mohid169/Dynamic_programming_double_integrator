@@ -32,7 +32,7 @@ actions = np.linspace(-5, 5, 51)
 V = np.zeros((len(states),))
 pi = np.zeros((len(states),))
 
-# Value Iteration Algorithm
+# Value Iteration Algorithm 
 max_iterations = 1000
 tolerance = 1e-3
 
@@ -81,6 +81,30 @@ for initial_state in initial_states:
     traj, ctrl = simulate_trajectory(initial_state, num_time_steps)
     trajectories.append(traj)
     controls.append(ctrl)
+
+def value_iteration():
+    V = np.zeros(len(states))
+    pi = np.zeros(len(states))
+    
+    for iteration in range(max_iterations):
+        V_old = V.copy()
+        
+        for i, state in enumerate(states):
+            Q_values = []
+            for action in actions:
+                next_state = state + (A @ state + B.flatten() * action) * dt
+                j = np.argmin(np.sum((states - next_state)**2, axis=1))
+                q_value = cost_function(state, np.array([action]), Q, R) + V_old[j]
+                Q_values.append(q_value)
+            
+            V[i] = min(Q_values)
+            pi[i] = actions[np.argmin(Q_values)]
+        
+        if np.max(np.abs(V - V_old)) < tolerance:
+            print(f"Converged after {iteration + 1} iterations")
+            break
+    
+    return V, pi
 
 # Visualization code
 frames = []
